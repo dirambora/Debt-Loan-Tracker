@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <provider
+            android:authorities="com.evanwaldron.debtloantracker.content"
+            android:name=".storage.DebtContentProvider" />
     </application>
 
 </manifest>
