@@ -16,6 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:label="@string/title_section_settings" >
+        </activity>
         
         <provider
             android:authorities="com.evanwaldron.debtloantracker.content"
