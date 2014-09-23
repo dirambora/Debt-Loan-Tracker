@@ -1,4 +1,4 @@
-package com.evanwaldron.debtloantracker;
+package com.evanwaldron.debtloantracker.ui;
 
 
 import android.app.Activity;
@@ -21,6 +21,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.evanwaldron.debtloantracker.R;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
