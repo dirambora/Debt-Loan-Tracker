@@ -47,7 +47,7 @@ public class NavigationActivity extends Activity
 
     private void showSettingsActivity(){
         Intent settings = new Intent(this, SettingsActivity.class);
-        settings.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        settings.putExtra(SettingsActivity.ARG_PARENT_NAME, NavigationActivity.class.getName());
         startActivity(settings);
     }
 
@@ -108,6 +108,7 @@ public class NavigationActivity extends Activity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            showSettingsActivity();
             return true;
         }
         return super.onOptionsItemSelected(item);
