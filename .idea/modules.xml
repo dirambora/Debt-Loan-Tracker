@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Debt Loan Tracker.iml" filepath="$PROJECT_DIR$/Debt Loan Tracker.iml" />
       <module fileurl="file://$PROJECT_DIR$/DebtLoanTracker.iml" filepath="$PROJECT_DIR$/DebtLoanTracker.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
