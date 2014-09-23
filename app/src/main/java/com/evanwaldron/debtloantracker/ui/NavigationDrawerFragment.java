@@ -4,6 +4,8 @@ package com.evanwaldron.debtloantracker.ui;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,7 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
@@ -99,15 +104,7 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                }));
+        mDrawerListView.setAdapter(new NavDrawerAdapter(getActionBar().getThemedContext(), R.array.nav_bar_items, R.array.nav_bar_icons));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
@@ -280,5 +277,55 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+    }
+
+    private static class NavDrawerAdapter extends BaseAdapter {
+
+        private final Context ctx;
+        private final String[] textVals;
+        private final TypedArray iconVals;
+
+        public NavDrawerAdapter(final Context ctx, int textArrayResId, int iconArrayResId){
+            this.ctx = ctx;
+            textVals = ctx.getResources().getStringArray(textArrayResId);
+            iconVals = ctx.getResources().obtainTypedArray(iconArrayResId);
+        }
+
+        @Override
+        public int getCount(){
+            return textVals.length;
+        }
+
+        @Override
+        public long getItemId(int position){
+            return position;
+        }
+
+        @Override
+        public Object getItem(int position){
+            return textVals[position];
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent){
+            if(convertView == null){
+                convertView = newView();
+            }
+
+            TextView text = (TextView) convertView.getTag(R.id.text);
+            ImageView icon = (ImageView) convertView.getTag(R.id.icon);
+
+            text.setText(textVals[position]);
+            icon.setImageDrawable(iconVals.getDrawable(position));
+
+            return convertView;
+        }
+
+        public View newView(){
+            View v = View.inflate(ctx, R.layout.nav_drawer_item, null);
+            v.setTag(R.id.text, v.findViewById(R.id.text));
+            v.setTag(R.id.icon, v.findViewById(R.id.icon));
+            return v;
+        }
     }
 }
