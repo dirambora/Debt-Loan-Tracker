@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="person_list_nav_items">
+        <item>All Items</item>
+        <item>Debts Only</item>
+        <item>Loans Only</item>
+    </string-array>
+
+    <string-array name="nav_bar_items">
+        <item>List</item>
+        <item>History</item>
+        <item>Settings</item>
+    </string-array>
+
+    <array name="nav_bar_icons">
+        <item>@drawable/ic_action_view_as_list</item>
+        <item>@drawable/ic_action_go_to_today</item>
+        <item>@drawable/ic_action_settings</item>
+    </array>
+
+    <string-array name="person_long_click_menu">
+        <item>Details</item>
+        <item>Clear Unpaid Items</item>
+        <item>Delete Person</item>
+    </string-array>
+
+    <string-array name="item_list_sort_by">
+        <item>Date (Newest to Oldest)</item>
+        <item>Date (Oldest to Newest)</item>
+        <item>Amount (Descending)</item>
+        <item>Amount (Ascending)</item>
+    </string-array>
+    <string-array name="item_list_sort_by_vals">
+        <item>created_at DESC</item>
+        <item>created_at ASC</item>
+        <item>ABS(amount) DESC</item>
+        <item>ABS(amount) ASC</item>
+    </string-array>
+
+    <string-array name="person_list_sort_by">
+        <item>Amount (Descending)</item>
+        <item>Amount (Ascending)</item>
+        <item>Name (A-Z)</item>
+        <item>Name (Z-A)</item>
+    </string-array>
+    <string-array name="person_list_sort_by_vals">
+        <item>ABS(net_balance) DESC</item>
+        <item>ABS(net_balance) ASC</item>
+        <item>name ASC</item>
+        <item>name DESC</item>
+    </string-array>
+</resources>
