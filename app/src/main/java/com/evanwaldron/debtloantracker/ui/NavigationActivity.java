@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,13 +45,28 @@ public class NavigationActivity extends Activity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
+    private void showSettingsActivity(){
+        Intent settings = new Intent(this, SettingsActivity.class);
+        settings.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(settings);
+    }
+
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+
+        switch(position){
+            case 2:
+                showSettingsActivity();
+                break;
+            default:
+                // update the main content by replacing fragments
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                        .commit();
+                break;
+
+        }
     }
 
     public void onSectionAttached(int number) {
@@ -60,9 +76,6 @@ public class NavigationActivity extends Activity
                 break;
             case 2:
                 mTitle = getString(R.string.title_section_history);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section_settings);
                 break;
         }
     }
