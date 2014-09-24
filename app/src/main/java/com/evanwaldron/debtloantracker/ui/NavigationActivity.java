@@ -66,6 +66,18 @@ public class NavigationActivity extends Activity
                 .commit();
     }
 
+    private void showHistoryFragment(){
+        HistoryFragment fragment = new HistoryFragment();
+        mCurActionBarConfig = fragment;
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+    }
+
+    boolean isDrawerOpen(){
+        return mNavigationDrawerFragment.isDrawerOpen();
+    }
+
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
@@ -73,17 +85,12 @@ public class NavigationActivity extends Activity
             case 0:
                 showPersonListFragment();
                 break;
+            case 1:
+                showHistoryFragment();
+                break;
             case 2:
                 showSettingsActivity();
                 break;
-            default:
-                // update the main content by replacing fragments
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                        .commit();
-                break;
-
         }
     }
 
