@@ -187,17 +187,25 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
+    private static final int POSITION_SETTINGS = 2;
+
     private void selectItem(int position) {
-        mCurrentSelectedPosition = position;
+        if(position != POSITION_SETTINGS) {
+            mCurrentSelectedPosition = position;
+        }
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
         }
-        if (mDrawerLayout != null) {
+        if (mDrawerLayout != null && position != POSITION_SETTINGS) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
+    }
+
+    public void closeNavigationDrawer(){
+        mDrawerLayout.closeDrawer(mFragmentContainerView);
     }
 
     @Override

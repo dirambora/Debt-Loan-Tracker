@@ -114,6 +114,15 @@ public class NavigationActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed(){
+        if(mNavigationDrawerFragment.isDrawerOpen()){
+            mNavigationDrawerFragment.closeNavigationDrawer();
+            return;
+        }
+        super.onBackPressed();
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
