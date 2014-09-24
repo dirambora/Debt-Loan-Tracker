@@ -5,16 +5,13 @@ import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 /**
@@ -38,10 +35,10 @@ public class DebtContentProvider extends ContentProvider {
 
     static{
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(AUTH, DebtStorage.Items.CONTENT_URI.getLastPathSegment() , ITEMS);
-        uriMatcher.addURI(AUTH, DebtStorage.People.CONTENT_URI.getLastPathSegment(), PEOPLE);
-        uriMatcher.addURI(AUTH, DebtStorage.Changes.CONTENT_URI.getLastPathSegment(), CHANGES);
-        uriMatcher.addURI(AUTH, DebtStorage.PersonInfo.CONTENT_URI.getLastPathSegment(), PERSON_INFO);
+        uriMatcher.addURI(AUTH, Storage.Items.CONTENT_URI.getLastPathSegment() , ITEMS);
+        uriMatcher.addURI(AUTH, Storage.People.CONTENT_URI.getLastPathSegment(), PEOPLE);
+        uriMatcher.addURI(AUTH, Storage.Changes.CONTENT_URI.getLastPathSegment(), CHANGES);
+        uriMatcher.addURI(AUTH, Storage.PersonInfo.CONTENT_URI.getLastPathSegment(), PERSON_INFO);
     }
 
     @Override
@@ -80,13 +77,13 @@ public class DebtContentProvider extends ContentProvider {
 
         switch(uriMatcher.match(uri)){
             case ITEMS:
-                result = db.query(DebtStorage.Items.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                result = db.query(Storage.Items.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case PEOPLE:
-                result = db.query(DebtStorage.People.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                result = db.query(Storage.People.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case PERSON_INFO:
-                result = db.query(DebtStorage.PersonInfo.VIEW_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                result = db.query(Storage.PersonInfo.VIEW_NAME, projection, selection, selectionArgs, null, null, sortOrder);
             default:
                 break;
         }
@@ -112,15 +109,15 @@ public class DebtContentProvider extends ContentProvider {
 
         switch(uriMatcher.match(uri)){
             case ITEMS:
-                result = db.insert(DebtStorage.Items.TABLE_NAME, null, values);
+                result = db.insert(Storage.Items.TABLE_NAME, null, values);
                 notificationUris = NOTIFICATION_URIS_ITEMS;
                 break;
             case PEOPLE:
-                result = db.insert(DebtStorage.People.TABLE_NAME, null, values);
+                result = db.insert(Storage.People.TABLE_NAME, null, values);
                 notificationUris = NOTIFICATION_URIS_PEOPLE;
                 break;
             case CHANGES:
-                result = db.insert(DebtStorage.Changes.TABLE_NAME, null, values);
+                result = db.insert(Storage.Changes.TABLE_NAME, null, values);
                 notificationUris = NOTIFICATION_URIS_CHANGES;
                 break;
             case PERSON_INFO:
@@ -142,9 +139,9 @@ public class DebtContentProvider extends ContentProvider {
         return Uri.withAppendedPath(uri, Long.toString(result));
     }
 
-    private static final Uri[] NOTIFICATION_URIS_PEOPLE = { DebtStorage.People.CONTENT_URI, DebtStorage.PersonInfo.CONTENT_URI };
-    private static final Uri[] NOTIFICATION_URIS_ITEMS = { DebtStorage.Items.CONTENT_URI, DebtStorage.PersonInfo.CONTENT_URI };
-    private static final Uri[] NOTIFICATION_URIS_CHANGES = { DebtStorage.Changes.CONTENT_URI };
+    private static final Uri[] NOTIFICATION_URIS_PEOPLE = { Storage.People.CONTENT_URI, Storage.PersonInfo.CONTENT_URI };
+    private static final Uri[] NOTIFICATION_URIS_ITEMS = { Storage.Items.CONTENT_URI, Storage.PersonInfo.CONTENT_URI };
+    private static final Uri[] NOTIFICATION_URIS_CHANGES = { Storage.Changes.CONTENT_URI };
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -156,15 +153,15 @@ public class DebtContentProvider extends ContentProvider {
 
         switch(uriMatcher.match(uri)){
             case PEOPLE:
-                result = db.delete(DebtStorage.People.TABLE_NAME, selection, selectionArgs);
+                result = db.delete(Storage.People.TABLE_NAME, selection, selectionArgs);
                 notificationUris = NOTIFICATION_URIS_PEOPLE;
                 break;
             case ITEMS:
-                result = db.delete(DebtStorage.Items.TABLE_NAME, selection, selectionArgs);
+                result = db.delete(Storage.Items.TABLE_NAME, selection, selectionArgs);
                 notificationUris = NOTIFICATION_URIS_ITEMS;
                 break;
             case CHANGES:
-                result = db.delete(DebtStorage.Changes.TABLE_NAME, selection, selectionArgs);
+                result = db.delete(Storage.Changes.TABLE_NAME, selection, selectionArgs);
                 notificationUris = NOTIFICATION_URIS_CHANGES;
                 break;
             case PERSON_INFO:
@@ -195,7 +192,7 @@ public class DebtContentProvider extends ContentProvider {
 
         switch(uriMatcher.match(uri)){
             case ITEMS:
-                result = db.update(DebtStorage.Items.TABLE_NAME, values, selection, selectionArgs);
+                result = db.update(Storage.Items.TABLE_NAME, values, selection, selectionArgs);
                 notificationUris = NOTIFICATION_URIS_ITEMS;
                 break;
         }

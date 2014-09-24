@@ -5,7 +5,7 @@ import android.net.Uri;
 /**
  * Created by Evan on 8/18/2014.
  */
-public final class DebtStorage {
+public final class Storage {
     public static final String AUTH = "com.evanwaldron.debtloantracker.content";
 
     public final static class Items{

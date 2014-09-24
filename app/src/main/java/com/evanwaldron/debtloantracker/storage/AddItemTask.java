@@ -90,12 +90,12 @@ public final class AddItemTask extends AsyncTask<AddItemTask.TaskInfo, Void, Con
     }
 
 
-    private static final String[] GET_PERSON_ID_PROJECTION = { DebtStorage.People.ID };
-    private static final String GET_PERSON_ID_SELECTION = DebtStorage.People.NAME + " = ?";
+    private static final String[] GET_PERSON_ID_PROJECTION = { Storage.People.ID };
+    private static final String GET_PERSON_ID_SELECTION = Storage.People.NAME + " = ?";
 
     private int getPersonId(String name){
 
-        Cursor cursor = resolver.query(DebtStorage.People.CONTENT_URI, GET_PERSON_ID_PROJECTION, GET_PERSON_ID_SELECTION, new String[]{ name }, null);
+        Cursor cursor = resolver.query(Storage.People.CONTENT_URI, GET_PERSON_ID_PROJECTION, GET_PERSON_ID_SELECTION, new String[]{ name }, null);
         if(cursor.getCount() == 0){
             return -1;
         }

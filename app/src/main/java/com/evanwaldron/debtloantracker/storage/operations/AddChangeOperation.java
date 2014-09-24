@@ -3,7 +3,7 @@ package com.evanwaldron.debtloantracker.storage.operations;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 
-import com.evanwaldron.debtloantracker.storage.DebtStorage;
+import com.evanwaldron.debtloantracker.storage.Storage;
 
 /**
  * Created by Evan on 9/22/2014.
@@ -20,23 +20,23 @@ public final class AddChangeOperation {
         public ContentValues toContentValues(){
             ContentValues values = new ContentValues();
 
-            values.put(DebtStorage.Changes.PERSON_ID, personId);
-            values.put(DebtStorage.Changes.ITEM_ID, itemId);
-            values.put(DebtStorage.Changes.AMOUNT, changeAmount);
+            values.put(Storage.Changes.PERSON_ID, personId);
+            values.put(Storage.Changes.ITEM_ID, itemId);
+            values.put(Storage.Changes.AMOUNT, changeAmount);
 
             return values;
         }
     }
 
     public static ContentProviderOperation newOperation(Params params){
-        ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(DebtStorage.Changes.CONTENT_URI);
+        ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(Storage.Changes.CONTENT_URI);
 
         builder.withValues(params.toContentValues());
         if(params.itemId == -1){
-            builder.withValueBackReference(DebtStorage.Changes.ITEM_ID, params.itemIdBackRef);
+            builder.withValueBackReference(Storage.Changes.ITEM_ID, params.itemIdBackRef);
         }
         if(params.personId == -1){
-            builder.withValueBackReference(DebtStorage.Changes.ITEM_ID, params.personIdBackRef);
+            builder.withValueBackReference(Storage.Changes.ITEM_ID, params.personIdBackRef);
         }
 
         return builder.build();

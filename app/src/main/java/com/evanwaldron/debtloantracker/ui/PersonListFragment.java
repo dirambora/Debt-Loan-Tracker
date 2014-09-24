@@ -24,7 +24,7 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.evanwaldron.debtloantracker.R;
-import com.evanwaldron.debtloantracker.storage.DebtStorage;
+import com.evanwaldron.debtloantracker.storage.Storage;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -91,8 +91,8 @@ public class PersonListFragment extends ListFragment
     }
 
     private static final String SELECTION_ALL = null;
-    private static final String SELECTION_DEBTS_ONLY = DebtStorage.PersonInfo.NET_BALANCE + " < 0";
-    private static final String SELECTION_LOANS_ONLY = DebtStorage.PersonInfo.NET_BALANCE + " > 0";
+    private static final String SELECTION_DEBTS_ONLY = Storage.PersonInfo.NET_BALANCE + " < 0";
+    private static final String SELECTION_LOANS_ONLY = Storage.PersonInfo.NET_BALANCE + " > 0";
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -125,13 +125,13 @@ public class PersonListFragment extends ListFragment
         }
     }
 
-    private static final String[] PERSON_LIST_PROJECTION = { DebtStorage.PersonInfo.ID, DebtStorage.PersonInfo.NAME, DebtStorage.PersonInfo.NET_BALANCE };
+    private static final String[] PERSON_LIST_PROJECTION = { Storage.PersonInfo.ID, Storage.PersonInfo.NAME, Storage.PersonInfo.NET_BALANCE };
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortBy = prefs.getString(getString(R.string.pref_key_person_list_sort_by), getString(R.string.pref_person_list_sort_by_default));
-        return new CursorLoader(getActivity(), DebtStorage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, mSelection, null, sortBy);
+        return new CursorLoader(getActivity(), Storage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, mSelection, null, sortBy);
     }
 
     @Override
@@ -174,9 +174,9 @@ public class PersonListFragment extends ListFragment
             nameView = (TextView) view.getTag(R.id.name);
             balanceView = (TextView) view.getTag(R.id.balance);
 
-            int id = cursor.getInt(cursor.getColumnIndex(DebtStorage.PersonInfo.ID));
-            String name = cursor.getString(cursor.getColumnIndex(DebtStorage.PersonInfo.NAME));
-            double balance = cursor.getDouble(cursor.getColumnIndex(DebtStorage.PersonInfo.NET_BALANCE));
+            int id = cursor.getInt(cursor.getColumnIndex(Storage.PersonInfo.ID));
+            String name = cursor.getString(cursor.getColumnIndex(Storage.PersonInfo.NAME));
+            double balance = cursor.getDouble(cursor.getColumnIndex(Storage.PersonInfo.NET_BALANCE));
 
             view.setTag(R.id.person_id, id);
             nameView.setText(name);
