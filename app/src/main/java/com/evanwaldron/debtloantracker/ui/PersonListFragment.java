@@ -29,7 +29,11 @@ public class PersonListFragment extends ListFragment implements NavigationActivi
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
-        inflater.inflate(R.menu.person_list, menu);
+        if(((NavigationActivity)getActivity()).isDrawerOpen()){
+            super.onCreateOptionsMenu(menu, inflater);
+        }else{
+            inflater.inflate(R.menu.person_list, menu);
+        }
     }
 
     @Override
