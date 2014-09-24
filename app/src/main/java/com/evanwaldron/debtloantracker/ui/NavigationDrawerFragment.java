@@ -64,6 +64,7 @@ public class NavigationDrawerFragment extends Fragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    private boolean mFirstTime = true;
 
     public NavigationDrawerFragment() {
     }
@@ -190,6 +191,8 @@ public class NavigationDrawerFragment extends Fragment {
     private static final int POSITION_SETTINGS = 2;
 
     private void selectItem(int position) {
+        boolean sameItem = (position == mCurrentSelectedPosition) && !mFirstTime;
+        mFirstTime = false;
         if(position != POSITION_SETTINGS) {
             mCurrentSelectedPosition = position;
         }
@@ -199,7 +202,7 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerLayout != null && position != POSITION_SETTINGS) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null) {
+        if (mCallbacks != null && !sameItem) {
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
     }
@@ -242,7 +245,6 @@ public class NavigationDrawerFragment extends Fragment {
         // If the drawer is open, show the global app actions in the action bar. See also
         // showGlobalContextActionBar, which controls the top-left area of the action bar.
         if (mDrawerLayout != null && isDrawerOpen()) {
-            inflater.inflate(R.menu.global, menu);
             showGlobalContextActionBar();
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -251,11 +253,6 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
             return true;
         }
 
