@@ -1,6 +1,8 @@
 package com.evanwaldron.debtloantracker.ui;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -8,11 +10,15 @@ import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.evanwaldron.debtloantracker.R;
@@ -77,6 +84,28 @@ public class PersonListFragment extends ListFragment
         dialog.show(transaction, TAG_ADD_ITEM_DIALOG);
     }
 
+    private static final String TAG_SORT_BY_DIALOG = "sort_by_dialog";
+
+    private void showSortByDialog(){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag(TAG_SORT_BY_DIALOG);
+        if(prev != null){
+            ft.remove(prev);
+        }
+
+        ft.addToBackStack(null);
+
+        SortByDialogFragment dialog = new SortByDialogFragment();
+        dialog.setHandler(new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                getLoaderManager().restartLoader(R.id.person_list_loader, null, PersonListFragment.this);
+                return true;
+            }
+        }));
+        dialog.show(ft, TAG_SORT_BY_DIALOG);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
@@ -86,8 +115,22 @@ public class PersonListFragment extends ListFragment
             case R.id.action_add_loan:
                 showAddItemDialog(AddItemDialog.MODE_LOAN);
                 return true;
+            case R.id.action_sort_by:
+                showSortByDialog();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListItemClick(ListView list, View view, int position, long id){
+        int personId = (Integer) view.getTag(R.id.person_id);
+        String personName = ((TextView)view.getTag(R.id.name)).getText().toString();
+
+        Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
+        intent.putExtra(PersonDetailActivity.ARG_PERSON_NAME, personName);
+        intent.putExtra(PersonDetailActivity.ARG_PERSON_ID, personId);
+        startActivity(intent);
     }
 
     private static final String SELECTION_ALL = null;
@@ -188,6 +231,60 @@ public class PersonListFragment extends ListFragment
             int color = (balance < 0) ? Color.RED : ctx.getResources().getColor(R.color.loan_green);
             view.setTextColor(color);
             view.setText(mCurrencyFormat.format(Math.abs(balance)));
+        }
+    }
+
+    public static final class SortByDialogFragment extends DialogFragment{
+
+        private String[] sortByOptions;
+        private Handler onFinish;
+
+        @Override
+        public void onCreate(Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+
+            sortByOptions = getResources().getStringArray(R.array.person_list_sort_by_vals);
+        }
+
+        public void setHandler(final Handler handler){
+            onFinish = handler;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String sortBy = prefs.getString(getString(R.string.pref_key_person_list_sort_by), getString(R.string.pref_person_list_sort_by_default));
+            final int curPos = getCurPos(sortBy);
+            builder.setTitle(getString(R.string.action_sort_by))
+                    .setSingleChoiceItems(R.array.person_list_sort_by, curPos, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (which == curPos) {
+                                dismiss();
+                                return;
+                            }
+
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString(getString(R.string.pref_key_person_list_sort_by), sortByOptions[which]).commit();
+
+                            Message msg = onFinish.obtainMessage();
+                            onFinish.dispatchMessage(msg);
+                            dismiss();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null);
+
+            return builder.create();
+        }
+
+        private int getCurPos(String sortBy){
+            for(int i = 0; i < 4; i++){
+                if(sortBy.equals(sortByOptions[i])) {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }

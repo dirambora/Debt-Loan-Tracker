@@ -22,7 +22,12 @@
             android:label="@string/title_section_settings"
             android:launchMode="singleInstance">
         </activity>
-        
+
+        <activity android:name=".ui.PersonDetailActivity"
+            android:label="@string/title_section_person_detail"
+            android:parentActivityName=".ui.NavigationActivity" >
+        </activity>
+
         <provider
             android:authorities="com.evanwaldron.debtloantracker.content"
             android:name=".storage.DebtContentProvider" />
