@@ -1,13 +1,22 @@
 package com.evanwaldron.debtloantracker.ui;
 
 import android.app.ActionBar;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -23,12 +32,20 @@ import java.util.Locale;
 /**
  * Created by Evan on 9/23/2014.
  */
-public class PersonListFragment extends ListFragment implements NavigationActivity.ActionBarConfigurer, ActionBar.OnNavigationListener{
+public class PersonListFragment extends ListFragment
+        implements NavigationActivity.ActionBarConfigurer, ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>{
+
+    private CursorAdapter mAdapter;
+    private int mCurNavSelection = -1;
+    private String mSelection = SELECTION_ALL;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        mAdapter = new PersonListAdapter(getActivity());
+        setListAdapter(mAdapter);
     }
 
     @Override
@@ -47,9 +64,87 @@ public class PersonListFragment extends ListFragment implements NavigationActivi
         }
     }
 
+    private static final String TAG_ADD_ITEM_DIALOG = "add_item_dialog";
+
+    private void showAddItemDialog(int mode){
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag(TAG_ADD_ITEM_DIALOG);
+        if(prev != null){
+            transaction.remove(prev);
+        }
+
+        DialogFragment dialog = AddItemDialog.newInstance(mode);
+        dialog.show(transaction, TAG_ADD_ITEM_DIALOG);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case R.id.action_add_debt:
+                showAddItemDialog(AddItemDialog.MODE_DEBT);
+                return true;
+            case R.id.action_add_loan:
+                showAddItemDialog(AddItemDialog.MODE_LOAN);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private static final String SELECTION_ALL = null;
+    private static final String SELECTION_DEBTS_ONLY = DebtStorage.PersonInfo.NET_BALANCE + " < 0";
+    private static final String SELECTION_LOANS_ONLY = DebtStorage.PersonInfo.NET_BALANCE + " > 0";
+
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        return false;
+        if(itemPosition == mCurNavSelection){ return true; }
+
+        mCurNavSelection = itemPosition;
+        switch(itemPosition){
+            case 0:
+                mSelection = SELECTION_ALL;
+                break;
+            case 1:
+                mSelection = SELECTION_DEBTS_ONLY;
+                break;
+            case 2:
+                mSelection = SELECTION_LOANS_ONLY;
+                break;
+        }
+
+        startLoader();
+
+        return true;
+    }
+
+    private void startLoader(){
+        LoaderManager manager = getLoaderManager();
+        if(manager.getLoader(R.id.person_list_loader) == null){
+            manager.initLoader(R.id.person_list_loader, null, this);
+        }else{
+            manager.restartLoader(R.id.person_list_loader, null, this);
+        }
+    }
+
+    private static final String[] PERSON_LIST_PROJECTION = { DebtStorage.PersonInfo.ID, DebtStorage.PersonInfo.NAME, DebtStorage.PersonInfo.NET_BALANCE };
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortBy = prefs.getString(getString(R.string.pref_key_person_list_sort_by), getString(R.string.pref_person_list_sort_by_default));
+        return new CursorLoader(getActivity(), DebtStorage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, mSelection, null, sortBy);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+        if(data.getCount() == 0){
+            setEmptyText("No entries");
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 
     private static final class PersonListAdapter extends CursorAdapter {
