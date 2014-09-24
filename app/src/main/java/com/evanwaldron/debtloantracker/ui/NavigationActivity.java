@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +21,10 @@ import com.evanwaldron.debtloantracker.R;
 public class NavigationActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public interface ActionBarConfigurer{
+        public void configureActionBar(ActionBar actionBar);
+    }
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -29,6 +34,8 @@ public class NavigationActivity extends Activity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+
+    private ActionBarConfigurer mCurActionBarConfig = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +58,21 @@ public class NavigationActivity extends Activity
         startActivity(settings);
     }
 
+    private void showPersonListFragment(){
+        PersonListFragment fragment = new PersonListFragment();
+        mCurActionBarConfig = fragment;
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+    }
+
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
         switch(position){
+            case 0:
+                showPersonListFragment();
+                break;
             case 2:
                 showSettingsActivity();
                 break;
@@ -81,6 +99,14 @@ public class NavigationActivity extends Activity
     }
 
     public void restoreActionBar() {
+        if(mCurActionBarConfig == null) {
+            restoreDefaultActionBar();
+        }else{
+            mCurActionBarConfig.configureActionBar(getActionBar());
+        }
+    }
+
+    private void restoreDefaultActionBar(){
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
