@@ -2,10 +2,13 @@ package com.evanwaldron.debtloantracker.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v4.app.NavUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.evanwaldron.debtloantracker.R;
@@ -62,6 +65,13 @@ public class SettingsActivity extends Activity{
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static void showSettings(Context from){
+        String className = from.getClass().getName();
+        Intent intent = new Intent(from, SettingsActivity.class);
+        intent.putExtra(ARG_PARENT_NAME, className);
+        from.startActivity(intent);
     }
 
 }

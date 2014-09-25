@@ -5,18 +5,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.view.Menu;
 import android.view.MenuItem;
+
+import com.evanwaldron.debtloantracker.R;
 
 /**
  * Created by Evan on 9/24/14.
  */
 public class PersonDetailActivity extends Activity {
 
-    public static final String ARG_PERSON_NAME = "person_name";
-    public static final String ARG_PERSON_ID = "person_id";
 
-    private String mPersonName;
-    private int mPersonId;
+    private PersonDetailFragment mPersonDetailFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -24,13 +24,28 @@ public class PersonDetailActivity extends Activity {
 
         Intent intent = getIntent();
 
-        mPersonId = intent.getIntExtra(ARG_PERSON_ID, 0);
-        mPersonName = intent.getStringExtra(ARG_PERSON_NAME);
+        int personId = intent.getIntExtra(PersonDetailFragment.ARG_PERSON_ID, 0);
+        String personName = intent.getStringExtra(PersonDetailFragment.ARG_PERSON_NAME);
 
         ActionBar bar = getActionBar();
-        bar.setTitle(mPersonName);
+        bar.setTitle(personName);
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setHomeButtonEnabled(true);
+
+        mPersonDetailFragment = PersonDetailFragment.newInstance(personId, personName);
+
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, mPersonDetailFragment)
+                .commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.navigation, menu);
+        if(mPersonDetailFragment != null){
+            mPersonDetailFragment.restoreActionBar(getActionBar());
+        }
+        return true;
     }
 
     @Override
@@ -38,6 +53,9 @@ public class PersonDetailActivity extends Activity {
         switch(item.getItemId()){
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
+                return true;
+            case R.id.action_settings:
+                SettingsActivity.showSettings(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -72,14 +72,18 @@ public final class AddItemTask extends AsyncTask<AddItemTask.TaskInfo, Void, Con
         return results;
     }
 
+    public static final int MESSAGE_COMPLETED = 1;
+
     @Override
     protected void onPostExecute(ContentProviderResult[] results){
-        Message msg = onFinish.obtainMessage();
-        if(results != null){
-            msg.obj = "Success";
-        }else{
-            msg.obj = "Failure";
+        String message = "Success";
+        for(ContentProviderResult result : results){
+            if(result.uri == null){
+                message = "Failure";
+                break;
+            }
         }
+        Message msg = onFinish.obtainMessage(MESSAGE_COMPLETED, message);
         onFinish.dispatchMessage(msg);
     }
 

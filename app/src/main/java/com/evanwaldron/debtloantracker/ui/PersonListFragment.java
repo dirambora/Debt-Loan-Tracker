@@ -16,21 +16,26 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
+import com.evanwaldron.debtloantracker.storage.DeletePersonTask;
 import com.evanwaldron.debtloantracker.storage.Storage;
 
 import java.text.NumberFormat;
@@ -41,6 +46,8 @@ import java.util.Locale;
  */
 public class PersonListFragment extends ListFragment
         implements NavigationActivity.ActionBarConfigurer, ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>{
+
+    public static final String TAG = "person_list";
 
     private CursorAdapter mAdapter;
     private int mCurNavSelection = -1;
@@ -53,6 +60,24 @@ public class PersonListFragment extends ListFragment
 
         mAdapter = new PersonListAdapter(getActivity());
         setListAdapter(mAdapter);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
+        View v = super.onCreateView(inflater, parent, savedInstanceState);
+
+        ListView list = (ListView) v.findViewById(android.R.id.list);
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                int personId = (Integer) view.getTag(R.id.person_id);
+                String personName = ((TextView)view.getTag(R.id.name)).getText().toString();
+                showLongClickOptions(personId, personName);
+                return true;
+            }
+        });
+
+        return v;
     }
 
     @Override
@@ -74,27 +99,13 @@ public class PersonListFragment extends ListFragment
     private static final String TAG_ADD_ITEM_DIALOG = "add_item_dialog";
 
     private void showAddItemDialog(int mode){
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag(TAG_ADD_ITEM_DIALOG);
-        if(prev != null){
-            transaction.remove(prev);
-        }
-
         DialogFragment dialog = AddItemDialog.newInstance(mode);
-        dialog.show(transaction, TAG_ADD_ITEM_DIALOG);
+        showDialogFragment(dialog, TAG_ADD_ITEM_DIALOG);
     }
 
     private static final String TAG_SORT_BY_DIALOG = "sort_by_dialog";
 
     private void showSortByDialog(){
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag(TAG_SORT_BY_DIALOG);
-        if(prev != null){
-            ft.remove(prev);
-        }
-
-        ft.addToBackStack(null);
-
         SortByDialogFragment dialog = new SortByDialogFragment();
         dialog.setHandler(new Handler(new Handler.Callback() {
             @Override
@@ -103,7 +114,27 @@ public class PersonListFragment extends ListFragment
                 return true;
             }
         }));
-        dialog.show(ft, TAG_SORT_BY_DIALOG);
+
+        showDialogFragment(dialog, TAG_SORT_BY_DIALOG);
+    }
+
+    private static final String TAG_LONG_CLICK_OPTIONS = "long_click_options";
+
+    private void showLongClickOptions(int personId, String name){
+        LongClickDialog dialog = LongClickDialog.newInstance(personId, name);
+        showDialogFragment(dialog, TAG_LONG_CLICK_OPTIONS);
+    }
+
+    private void showDialogFragment(DialogFragment fragment, String tag){
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        if(tag != null) {
+            Fragment prev = getFragmentManager().findFragmentByTag(tag);
+            if (prev != null) {
+                transaction.remove(prev);
+            }
+        }
+        transaction.addToBackStack(null);
+        fragment.show(transaction, tag);
     }
 
     @Override
@@ -128,9 +159,20 @@ public class PersonListFragment extends ListFragment
         String personName = ((TextView)view.getTag(R.id.name)).getText().toString();
 
         Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
-        intent.putExtra(PersonDetailActivity.ARG_PERSON_NAME, personName);
-        intent.putExtra(PersonDetailActivity.ARG_PERSON_ID, personId);
+        intent.putExtra(PersonDetailFragment.ARG_PERSON_NAME, personName);
+        intent.putExtra(PersonDetailFragment.ARG_PERSON_ID, personId);
         startActivity(intent);
+    }
+
+    private void deletePerson(int personId){
+        DeletePersonTask task = new DeletePersonTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }));
+        task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
     }
 
     private static final String SELECTION_ALL = null;
@@ -286,5 +328,58 @@ public class PersonListFragment extends ListFragment
             }
             return -1;
         }
+    }
+
+    public static final class LongClickDialog extends DialogFragment{
+
+        private static final String ARG_PERSON_ID = "person_id";
+        private static final String ARG_PERSON_NAME = "person_name";
+
+        private static final int DETAILS = 0;
+        private static final int CLEAR_ITEMS = 1;
+        private static final int DELETE_PERSON = 2;
+
+        public static LongClickDialog newInstance(int personId, String personName){
+            LongClickDialog dialog = new LongClickDialog();
+
+            Bundle args = new Bundle();
+            args.putInt(ARG_PERSON_ID, personId);
+            args.putString(ARG_PERSON_NAME, personName);
+            dialog.setArguments(args);
+
+            return dialog;
+        }
+
+        private int mPersonId;
+        private String mPersonName;
+
+        @Override
+        public void onCreate(Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+
+            mPersonId = getArguments().getInt(ARG_PERSON_ID);
+            mPersonName = getArguments().getString(ARG_PERSON_NAME);
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            builder.setTitle(mPersonName)
+                    .setItems(R.array.person_long_click_menu, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DELETE_PERSON:
+                                    PersonListFragment fragment = (PersonListFragment) getFragmentManager().findFragmentByTag(TAG);
+                                    fragment.deletePerson(mPersonId);
+                                    break;
+                            }
+                        }
+                    });
+
+            return builder.create();
+        }
+
     }
 }

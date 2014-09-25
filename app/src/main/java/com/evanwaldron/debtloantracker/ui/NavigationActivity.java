@@ -52,17 +52,11 @@ public class NavigationActivity extends Activity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
-    private void showSettingsActivity(){
-        Intent settings = new Intent(this, SettingsActivity.class);
-        settings.putExtra(SettingsActivity.ARG_PARENT_NAME, NavigationActivity.class.getName());
-        startActivity(settings);
-    }
-
     private void showPersonListFragment(){
         PersonListFragment fragment = new PersonListFragment();
         mCurActionBarConfig = fragment;
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment)
+                .replace(R.id.container, fragment, PersonListFragment.TAG)
                 .commit();
     }
 
@@ -89,7 +83,7 @@ public class NavigationActivity extends Activity
                 showHistoryFragment();
                 break;
             case 2:
-                showSettingsActivity();
+                SettingsActivity.showSettings(this);
                 break;
         }
     }
@@ -141,7 +135,7 @@ public class NavigationActivity extends Activity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            showSettingsActivity();
+            SettingsActivity.showSettings(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
