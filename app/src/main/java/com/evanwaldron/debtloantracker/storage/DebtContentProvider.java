@@ -169,7 +169,7 @@ public class DebtContentProvider extends ContentProvider {
         }
 
         if(result <= 0){
-            Log.e(LOG_TAG, "An error occurred during insertion on " + uri.toString());
+            Log.e(LOG_TAG, "An error occurred during deletion from " + uri.toString());
             return result;
         }
 
