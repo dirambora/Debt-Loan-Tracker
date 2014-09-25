@@ -9,9 +9,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
 
-import com.evanwaldron.debtloantracker.storage.operations.DeleteAllChangesOperation;
-import com.evanwaldron.debtloantracker.storage.operations.DeleteAllItemsOperation;
-import com.evanwaldron.debtloantracker.storage.operations.DeletePersonOperation;
+import com.evanwaldron.debtloantracker.storage.operations.delete.DeleteAllChangesOperation;
+import com.evanwaldron.debtloantracker.storage.operations.delete.DeleteAllItemsOperation;
+import com.evanwaldron.debtloantracker.storage.operations.delete.DeletePersonOperation;
 
 import java.util.ArrayList;
 

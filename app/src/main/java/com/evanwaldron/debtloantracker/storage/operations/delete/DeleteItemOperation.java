@@ -1,4 +1,4 @@
-package com.evanwaldron.debtloantracker.storage.operations;
+package com.evanwaldron.debtloantracker.storage.operations.delete;
 
 import android.content.ContentProviderOperation;
 
