@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="@string/action_add"
+        android:icon="@drawable/ic_action_new"
+        android:showAsAction="ifRoom" >
+
+        <menu>
+            <item
+                android:id="@+id/action_add_debt"
+                android:title="@string/action_add_debt"
+                android:showAsAction="never" />
+            <item
+                android:id="@+id/action_add_loan"
+                android:title="@string/action_add_loan"
+                android:showAsAction="never" />
+        </menu>
+
+    </item>
+
+    <item
+        android:id="@+id/action_sort_by"
+        android:title="@string/action_sort_by"
+        android:showAsAction="never"
+        android:orderInCategory="150" />
+
+    <item
+        android:id="@+id/action_show_paid"
+        android:title="@string/show_paid"
+        android:checkable="true"
+        android:orderInCategory="175" />
+</menu>
