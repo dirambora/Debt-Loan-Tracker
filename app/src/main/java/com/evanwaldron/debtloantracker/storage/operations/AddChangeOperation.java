@@ -10,6 +10,8 @@ import com.evanwaldron.debtloantracker.storage.Storage;
  */
 public final class AddChangeOperation {
 
+    private AddChangeOperation(){}
+
     public static final class Params{
         public int personId = -1;
         public int itemId = -1;
@@ -36,7 +38,7 @@ public final class AddChangeOperation {
             builder.withValueBackReference(Storage.Changes.ITEM_ID, params.itemIdBackRef);
         }
         if(params.personId == -1){
-            builder.withValueBackReference(Storage.Changes.ITEM_ID, params.personIdBackRef);
+            builder.withValueBackReference(Storage.Changes.PERSON_ID, params.personIdBackRef);
         }
 
         return builder.build();

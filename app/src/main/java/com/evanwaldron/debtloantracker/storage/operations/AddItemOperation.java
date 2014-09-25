@@ -10,6 +10,8 @@ import com.evanwaldron.debtloantracker.storage.Storage;
  */
 public final class AddItemOperation {
 
+    private AddItemOperation(){}
+
     public static class Params{
         public int personId = -1;
         public double amount = 0.0;
