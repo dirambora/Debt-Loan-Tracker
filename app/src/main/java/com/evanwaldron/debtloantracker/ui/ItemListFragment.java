@@ -15,6 +15,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,12 +27,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
+import com.evanwaldron.debtloantracker.storage.PayItemTask;
 import com.evanwaldron.debtloantracker.storage.Storage;
 
 import java.text.DateFormat;
@@ -65,12 +69,51 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
         return fragment;
     }
 
+    private static final String TAG_ITEM_OPTIONS_DIALOG = "item_options_dialog";
+
+    private void showItemOptionsDialog(int id, boolean payed){
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag(TAG_ITEM_OPTIONS_DIALOG);
+        if(prev != null){
+            transaction.remove(prev);
+        }
+
+        DialogFragment dialog = ItemOptionsDialogFragment.newInstance(id, payed);
+        dialog.show(transaction, TAG_ITEM_OPTIONS_DIALOG);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
         View v = super.onCreateView(inflater, parent, savedInstanceState);
 
+        ListView list = (ListView) v.findViewById(android.R.id.list);
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                int itemId;
+                boolean payed;
+
+                itemId = (Integer) view.getTag(R.id.item_id);
+                payed = (Boolean) view.getTag(R.id.item_paid);
+
+                showItemOptionsDialog(itemId, payed);
+                return true;
+            }
+        });
+
         startLoader();
         return v;
+    }
+
+    private void payItem(int itemId){
+        PayItemTask payItemTask = new PayItemTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }));
+        payItemTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, itemId);
     }
 
     @Override
@@ -198,7 +241,7 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
         return true;
     }
 
-    private static final String[] ITEM_LIST_PROJECTION = { Storage.Items.ID, Storage.Items.AMOUNT, Storage.Items.DESCRIPTION, Storage.Items.DATE_CREATED };
+    private static final String[] ITEM_LIST_PROJECTION = { Storage.Items.ID, Storage.Items.AMOUNT, Storage.Items.DESCRIPTION, Storage.Items.DATE_CREATED, Storage.Items.PAYED };
     private static final String ITEM_LIST_SELECTION = Storage.Items.PERSON_ID + " = ?";
     private static final String HIDE_PAID_CLAUSE = " AND " + Storage.Items.PAYED + " = 0";
 
@@ -277,6 +320,9 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
             descriptionView = (TextView) view.getTag(R.id.description);
             amountView = (TextView) view.getTag(R.id.amount);
 
+            view.setTag(R.id.item_id, cursor.getInt(cursor.getColumnIndex(Storage.Items.ID)));
+            view.setTag(R.id.item_paid, (cursor.getInt(cursor.getColumnIndex(Storage.Items.PAYED)) == 0));
+
             dateView.setText(getDateString(cursor.getString(cursor.getColumnIndex(Storage.Items.DATE_CREATED))));
             descriptionView.setText(cursor.getString(cursor.getColumnIndex(Storage.Items.DESCRIPTION)));
             bindAmount(amountView, cursor.getDouble(cursor.getColumnIndex(Storage.Items.AMOUNT)));
@@ -335,5 +381,50 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
             }
             return -1;
         }
+    }
+
+    public static final class ItemOptionsDialogFragment extends DialogFragment{
+
+        private static final String ARG_ITEM_ID = "item_id";
+        private static final String ARG_ITEM_PAYED = "item_paid";
+
+        public static ItemOptionsDialogFragment newInstance(int itemId, boolean payed){
+            ItemOptionsDialogFragment dialogFragment = new ItemOptionsDialogFragment();
+
+            Bundle args = new Bundle();
+            args.putInt(ARG_ITEM_ID, itemId);
+            args.putBoolean(ARG_ITEM_PAYED, payed);
+            dialogFragment.setArguments(args);
+
+            return dialogFragment;
+        }
+
+        private int mItemId;
+        private boolean mPayed;
+
+        @Override
+        public void onCreate(Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+
+            Bundle args = getArguments();
+            mItemId = args.getInt(ARG_ITEM_ID);
+            mPayed = args.getBoolean(ARG_ITEM_PAYED);
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            builder.setTitle(R.string.options)
+                    .setItems(mPayed ? R.array.item_long_click_menu_paid : R.array.item_long_click_menu_unpaid, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+
+            return builder.create();
+        }
+
     }
 }

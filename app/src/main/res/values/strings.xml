@@ -23,6 +23,7 @@
     <string name="action_add_debt">Add Debt</string>
     <string name="action_add_loan">Add Loan</string>
     <string name="action_sort_by">Sort By</string>
+    <string name="options">Options</string>
 
     <string name="pref_cat_person_list">Person List</string>
     <string name="pref_cat_person_detail">Person Detail</string>

@@ -49,4 +49,16 @@
         <item>name ASC</item>
         <item>name DESC</item>
     </string-array>
+
+    <string-array name="item_long_click_menu_unpaid">
+        <item>Pay Item</item>
+        <item>Delete Item</item>
+        <item>Details</item>
+    </string-array>
+    <string-array name="item_long_click_menu_paid">
+        <item>Unpay Item</item>
+        <item>Delete Item</item>
+        <item>Details</item>
+    </string-array>
+
 </resources>
