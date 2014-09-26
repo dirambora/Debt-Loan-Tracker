@@ -16,6 +16,7 @@ public final class DeletePersonOperation {
         ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(Storage.People.CONTENT_URI);
 
         builder.withSelection(DELETE_PERSON_SELECTION, new String[]{ Integer.toString(personId) });
+        builder.withExpectedCount(1);
 
         return builder.build();
     }

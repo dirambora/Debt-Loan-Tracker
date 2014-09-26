@@ -16,6 +16,7 @@ public final class DeleteItemOperation {
         ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(Storage.Items.CONTENT_URI);
 
         builder.withSelection(DELETE_ITEM_SELECTION, new String[]{ Integer.toString(itemId) });
+        builder.withExpectedCount(1);
 
         return builder.build();
     }
