@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * Created by Evan on 8/18/2014.
+ * Created by Evan on 8/18/2014 12:37 PM 12:37 PM.
  */
 public class DBHelper extends SQLiteOpenHelper {
 
