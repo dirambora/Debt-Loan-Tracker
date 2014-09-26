@@ -35,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
-import com.evanwaldron.debtloantracker.storage.DeletePersonTask;
+import com.evanwaldron.debtloantracker.storage.tasks.DeletePersonTask;
 import com.evanwaldron.debtloantracker.storage.Storage;
 
 import java.text.NumberFormat;

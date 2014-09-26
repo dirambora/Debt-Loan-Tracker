@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
-import com.evanwaldron.debtloantracker.storage.AddItemTask;
+import com.evanwaldron.debtloantracker.storage.tasks.AddItemTask;
 
 /**
  * Created by Evan on 9/9/14.
