@@ -61,10 +61,9 @@ public class NavigationDrawerFragment extends Fragment {
     private ListView mDrawerListView;
     private View mFragmentContainerView;
 
-    private int mCurrentSelectedPosition = 0;
+    private int mCurrentSelectedPosition = -1;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
-    private boolean mFirstTime = true;
 
     public NavigationDrawerFragment() {
     }
@@ -84,7 +83,7 @@ public class NavigationDrawerFragment extends Fragment {
         }
 
         // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition);
+        selectItem(mCurrentSelectedPosition >= 0 ? mCurrentSelectedPosition : 0);
     }
 
     @Override
@@ -191,8 +190,7 @@ public class NavigationDrawerFragment extends Fragment {
     private static final int POSITION_SETTINGS = 2;
 
     private void selectItem(int position) {
-        boolean sameItem = (position == mCurrentSelectedPosition) && !mFirstTime;
-        mFirstTime = false;
+        boolean sameItem = (position == mCurrentSelectedPosition);
         if(position != POSITION_SETTINGS) {
             mCurrentSelectedPosition = position;
         }
