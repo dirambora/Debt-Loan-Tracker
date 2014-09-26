@@ -45,7 +45,7 @@ public class PersonDetailFragment extends Fragment {
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.person_info_container, mPersonInfo)
-                .replace(R.id.item_list_container, mItemList)
+                .replace(R.id.item_list_container, mItemList, ItemListFragment.FRAGMENT_TAG)
                 .commit();
     }
 

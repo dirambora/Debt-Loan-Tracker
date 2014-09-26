@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.text.format.DateUtils;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
-import com.evanwaldron.debtloantracker.storage.PayItemTask;
+import com.evanwaldron.debtloantracker.storage.tasks.SetPaidTask;
 import com.evanwaldron.debtloantracker.storage.Storage;
 
 import java.text.DateFormat;
@@ -49,6 +49,10 @@ import java.util.Locale;
  * Created by Evan on 9/23/14.
  */
 public class ItemListFragment extends ListFragment implements ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>{
+
+    public static final String FRAGMENT_TAG = "item_list";
+
+    private static final String LOG_TAG = ItemListFragment.class.getSimpleName();
 
     private static final String ARG_PERSON_ID = "person_id";
     private static final String ARG_PERSON_NAME = "person_name";
@@ -105,15 +109,15 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
         return v;
     }
 
-    private void payItem(int itemId){
-        PayItemTask payItemTask = new PayItemTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+    private void setPaid(int itemId, boolean paid){
+        SetPaidTask setPaid = new SetPaidTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
                 Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
                 return true;
             }
         }));
-        payItemTask.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, itemId);
+        setPaid.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new Pair<>(itemId, paid));
     }
 
     @Override
@@ -185,6 +189,7 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
         switch(item.getItemId()){
             case R.id.action_show_paid:
                 setShowPaid(!item.isChecked());
+                startLoader();
                 return true;
             case R.id.action_sort_by:
                 showSortByDialog();
@@ -252,7 +257,7 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
         if(mSelection != null){
             selection.append(" AND " + mSelection);
         }
-        if(prefs.getBoolean(getString(R.string.pref_key_item_list_show_paid), false)){
+        if(!prefs.getBoolean(getString(R.string.pref_key_item_list_show_paid), false)){
             selection.append(HIDE_PAID_CLAUSE);
         }
         String sortBy = prefs.getString(getString(R.string.pref_key_item_list_sort_by), getString(R.string.pref_item_list_sort_by_default));
@@ -321,7 +326,7 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
             amountView = (TextView) view.getTag(R.id.amount);
 
             view.setTag(R.id.item_id, cursor.getInt(cursor.getColumnIndex(Storage.Items.ID)));
-            view.setTag(R.id.item_paid, (cursor.getInt(cursor.getColumnIndex(Storage.Items.PAYED)) == 0));
+            view.setTag(R.id.item_paid, (cursor.getInt(cursor.getColumnIndex(Storage.Items.PAYED)) == 1));
 
             dateView.setText(getDateString(cursor.getString(cursor.getColumnIndex(Storage.Items.DATE_CREATED))));
             descriptionView.setText(cursor.getString(cursor.getColumnIndex(Storage.Items.DESCRIPTION)));
@@ -419,7 +424,12 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
                     .setItems(mPayed ? R.array.item_long_click_menu_paid : R.array.item_long_click_menu_unpaid, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
+                            switch(which){
+                                case 0:
+                                    ItemListFragment fragment = (ItemListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+                                    fragment.setPaid(mItemId, !mPayed);
+                                    break;
+                            }
                         }
                     });
 
