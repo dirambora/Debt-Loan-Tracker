@@ -45,6 +45,17 @@ public class DBHelper extends SQLiteOpenHelper {
             "COUNT(CASE WHEN " + Storage.Items.withTablePrefix(Storage.Items.PAYED) + "=1 THEN 1 END) AS " + Storage.PersonInfo.NUM_PAYED + " " +
             "FROM " + Storage.People.TABLE_NAME + " LEFT JOIN " + Storage.Items.TABLE_NAME + " ON " + Storage.People.withTablePrefix(Storage.People.ID) + " = " + Storage.Items.withTablePrefix(Storage.Items.PERSON_ID) + " GROUP BY " + Storage.People.NAME;
 
+    private static final String HISTORY_VIEW_CREATE = "CREATE VIEW IF NOT EXISTS " + Storage.History.VIEW_NAME + " AS SELECT " +
+            Storage.Changes.withTablePrefix(Storage.Changes.ID) + ", " +
+            Storage.Changes.withTablePrefix(Storage.Changes.PERSON_ID) + ", " +
+            Storage.Changes.withTablePrefix(Storage.Changes.ID) + ", " +
+            Storage.Changes.withTablePrefix(Storage.Changes.AMOUNT) + ", " +
+            Storage.Changes.withTablePrefix(Storage.Changes.DATE) + ", " +
+            Storage.People.withTablePrefix(Storage.People.NAME) + ", " +
+            Storage.Items.withTablePrefix(Storage.Items.DESCRIPTION) + " " +
+            "FROM " + Storage.Changes.TABLE_NAME + " JOIN " + Storage.People.TABLE_NAME + " ON " + Storage.Changes.withTablePrefix(Storage.Changes.PERSON_ID) + " = " + Storage.People.withTablePrefix(Storage.People.ID) + " " +
+            "JOIN " + Storage.Items.TABLE_NAME + " ON " + Storage.Changes.withTablePrefix(Storage.Changes.ITEM_ID) + " = " + Storage.Items.withTablePrefix(Storage.Items.ID);
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -60,6 +71,8 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.i(LOG_TAG, "Changes table created");
         db.execSQL(PERSON_INFO_VIEW_CREATE);
         Log.i(LOG_TAG, "Person info view created");
+        db.execSQL(HISTORY_VIEW_CREATE);
+        Log.i(LOG_TAG, "History view created");
     }
 
     @Override
