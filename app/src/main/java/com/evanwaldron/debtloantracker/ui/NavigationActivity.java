@@ -21,7 +21,15 @@ import com.evanwaldron.debtloantracker.R;
 public class NavigationActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    /**
+     * Interface that MUST be implemented by any fragment used in this activity that wishes to make
+     * use of the ActionBar.
+     */
     public interface ActionBarConfigurer{
+        /**
+         * Method that will be called by activity when action bar configuration is needed
+         * @param actionBar The action bar for this activity
+         */
         public void configureActionBar(ActionBar actionBar);
     }
 
