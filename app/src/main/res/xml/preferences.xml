@@ -29,7 +29,18 @@
         <CheckBoxPreference
             android:key="@string/pref_key_item_list_show_paid"
             android:title="@string/pref_title_show_paid"
-            android:summary="@string/pref_summary_show_paid" />
+            android:summary="@string/pref_summary_show_paid"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/title_section_history">
+
+        <com.evanwaldron.debtloantracker.prefs.NumberPickerPreference
+            android:key="@string/pref_key_history_show_items_num"
+            android:title="@string/pref_title_history_show_num"
+            android:defaultValue="200" />
 
     </PreferenceCategory>
 
