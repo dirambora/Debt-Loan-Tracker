@@ -9,6 +9,7 @@
             android:key="@string/pref_key_person_list_sort_by"
             android:title="@string/action_sort_by"
             android:dialogTitle="@string/action_sort_by"
+            android:summary="@string/pref_summary_sort_by"
             android:entries="@array/person_list_sort_by"
             android:entryValues="@array/person_list_sort_by_vals"
             android:defaultValue="@string/pref_person_list_sort_by_default"/>
@@ -28,6 +29,7 @@
             android:key="@string/pref_key_item_list_sort_by"
             android:title="@string/action_sort_by"
             android:dialogTitle="@string/action_sort_by"
+            android:summary="@string/pref_summary_sort_by"
             android:entries="@array/item_list_sort_by"
             android:entryValues="@array/item_list_sort_by_vals"
             android:defaultValue="@string/pref_item_list_sort_by_default" />
@@ -46,7 +48,7 @@
         <com.evanwaldron.debtloantracker.prefs.NumberPickerPreference
             android:key="@string/pref_key_history_show_items_num"
             android:title="@string/pref_title_history_show_num"
-            android:defaultValue="200" />
+            android:defaultValue="50" />
 
     </PreferenceCategory>
 

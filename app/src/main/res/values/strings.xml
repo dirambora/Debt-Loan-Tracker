@@ -37,6 +37,8 @@
     <string name="pref_title_show_zero_balance">Show Zero Balance</string>
     <string name="pref_summary_show_zero_balance">Show people who have a net balance of $0.00</string>
 
+    <string name="pref_summary_sort_by">Select sort order</string>
+
     <string name="pref_key_person_list_sort_by">person_list_sort_by</string>
     <string name="pref_key_item_list_sort_by">item_list_sort_by</string>
     <string name="pref_key_item_list_show_paid">item_list_show_paid</string>
@@ -46,11 +48,9 @@
     <string name="pref_person_list_sort_by_default">ABS(net_balance) DESC</string>
     <string name="pref_item_list_sort_by_default">created_at DESC</string>
 
-    <string name="history_description_middle_loaned">&#160;loaned&#160;</string>
-    <string name="history_description_middle_paid">&#160;paid&#160;</string>
-    <string name="you_upper_case">You</string>
-    <string name="you_lower_case">you</string>
-
-
-
+    <string name="history_description_you_paid">You paid&#160;</string>
+    <string name="history_description_you_loaned">You loaned&#160;</string>
+    <string name="history_description_loaned_you">&#160;loaned you&#160;</string>
+    <string name="history_description_paid_you">&#160;paid you&#160;</string>
+    <string name="history_description_for">&#160;for&#160;</string>
 </resources>
