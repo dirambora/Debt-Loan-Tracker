@@ -10,7 +10,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="owes_you">Owes you</string>
     <string name="you_owe">You owe</string>
-    <string name="num_unpayed">Num Unpayed Items:</string>
+    <string name="num_unpayed">Num Unpaid Items:</string>
 
     <string name="name">Name</string>
     <string name="amount">Amount</string>
