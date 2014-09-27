@@ -176,22 +176,28 @@ public class HistoryFragment extends ListFragment implements NavigationActivity.
 
             private SpannableStringBuilder spannable;
 
-            private static final void appendNamesPortion(Context ctx, SpannableStringBuilder builder, String name, double changeAmount, double itemAmount){
-                String firstName, secondName, middleText;
-                if(changeAmount < 0){
-                    firstName = name;
-                    secondName = ctx.getString(R.string.you_lower_case);
-                }else{
-                    firstName = ctx.getString(R.string.you_upper_case);
-                    secondName = name;
-                }
-                middleText = (changeAmount * itemAmount < 0) ? ctx.getString(R.string.history_description_middle_paid) : ctx.getString(R.string.history_description_middle_loaned);
-
+            private static final void appendName(SpannableStringBuilder builder, String name){
                 int spanStart = builder.length();
-                builder.append(firstName).setSpan(new StyleSpan(Typeface.BOLD), spanStart, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
-                builder.append(middleText);
-                spanStart = builder.length();
-                builder.append(secondName).setSpan(new StyleSpan(Typeface.BOLD), spanStart, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.append(name).setSpan(new StyleSpan(Typeface.BOLD), spanStart, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+            private static final void appendFirstSection(Context ctx, SpannableStringBuilder builder, String name, double changeAmount, double itemAmount){
+                if(changeAmount < 0){
+                    if(itemAmount < 0){
+                        builder.append(ctx.getString(R.string.history_description_you_paid));
+                    }else{
+                        builder.append(ctx.getString(R.string.history_description_you_loaned));
+                    }
+                    appendName(builder, name);
+                    builder.append(' ');
+                }else{
+                    appendName(builder, name);
+                    if(itemAmount < 0){
+                        builder.append(ctx.getString(R.string.history_description_loaned_you));
+                    }else{
+                        builder.append(ctx.getString(R.string.history_description_paid_you));
+                    }
+                }
             }
 
             private static final void appendChangeAmount(Context ctx, SpannableStringBuilder builder, double changeAmount){
@@ -201,19 +207,17 @@ public class HistoryFragment extends ListFragment implements NavigationActivity.
                 builder.setSpan(new ForegroundColorSpan(color), spanStart, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
             }
 
-            private static final void appendItemDescription(SpannableStringBuilder builder, String itemDescription){
-                builder.append("for ");
+            private static final void appendItemDescription(Context ctx, SpannableStringBuilder builder, String itemDescription){
+                builder.append(ctx.getString(R.string.history_description_for));
                 int startSpan = builder.length();
                 builder.append(itemDescription).setSpan(new StyleSpan(Typeface.BOLD), startSpan, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
             }
 
             public HistoryDescription(Context ctx, String name, String itemDescription, double changeAmount, double itemAmount){
                 spannable = new SpannableStringBuilder();
-                appendNamesPortion(ctx, spannable, name, changeAmount, itemAmount);
-                spannable.append(' ');
+                appendFirstSection(ctx, spannable, name, changeAmount, itemAmount);
                 appendChangeAmount(ctx, spannable, changeAmount);
-                spannable.append(' ');
-                appendItemDescription(spannable, itemDescription);
+                appendItemDescription(ctx, spannable, itemDescription);
             }
 
             @Override
