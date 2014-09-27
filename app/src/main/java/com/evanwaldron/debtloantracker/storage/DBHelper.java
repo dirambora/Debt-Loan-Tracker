@@ -49,10 +49,11 @@ public class DBHelper extends SQLiteOpenHelper {
             Storage.Changes.withTablePrefix(Storage.Changes.ID) + ", " +
             Storage.Changes.withTablePrefix(Storage.Changes.PERSON_ID) + ", " +
             Storage.Changes.withTablePrefix(Storage.Changes.ID) + ", " +
-            Storage.Changes.withTablePrefix(Storage.Changes.AMOUNT) + ", " +
-            Storage.Changes.withTablePrefix(Storage.Changes.DATE) + ", " +
+            Storage.Changes.withTablePrefix(Storage.Changes.AMOUNT) + " AS " + Storage.History.CHANGE_AMOUNT + ", " +
+            "datetime(" + Storage.Changes.withTablePrefix(Storage.Changes.DATE) + ", 'localtime') AS " + Storage.History.DATE + ", " +
             Storage.People.withTablePrefix(Storage.People.NAME) + ", " +
-            Storage.Items.withTablePrefix(Storage.Items.DESCRIPTION) + " " +
+            Storage.Items.withTablePrefix(Storage.Items.DESCRIPTION) + ", " +
+            Storage.Items.withTablePrefix(Storage.Items.AMOUNT) + " AS " + Storage.History.ITEM_AMOUNT + " " +
             "FROM " + Storage.Changes.TABLE_NAME + " JOIN " + Storage.People.TABLE_NAME + " ON " + Storage.Changes.withTablePrefix(Storage.Changes.PERSON_ID) + " = " + Storage.People.withTablePrefix(Storage.People.ID) + " " +
             "JOIN " + Storage.Items.TABLE_NAME + " ON " + Storage.Changes.withTablePrefix(Storage.Changes.ITEM_ID) + " = " + Storage.Items.withTablePrefix(Storage.Items.ID);
 

@@ -61,4 +61,15 @@
         <item>Details</item>
     </string-array>
 
+    <string-array name="num_selector_vals">
+        <item>25</item>
+        <item>50</item>
+        <item>75</item>
+        <item>100</item>
+        <item>150</item>
+        <item>200</item>
+        <item>250</item>
+        <item>500</item>
+        <item>No Limit</item>
+    </string-array>
 </resources>

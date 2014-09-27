@@ -34,13 +34,23 @@
     <string name="pref_title_history_show_num">History List Limit</string>
     <string name="pref_summary_history_show_num">&#160;item limit</string>
 
+    <string name="pref_title_show_zero_balance">Show Zero Balance</string>
+    <string name="pref_summary_show_zero_balance">Show people who have a net balance of $0.00</string>
+
     <string name="pref_key_person_list_sort_by">person_list_sort_by</string>
     <string name="pref_key_item_list_sort_by">item_list_sort_by</string>
     <string name="pref_key_item_list_show_paid">item_list_show_paid</string>
     <string name="pref_key_history_show_items_num">history_show_items_num</string>
-
+    <string name="pref_key_person_list_show_zero">person_list_show_zero</string>
 
     <string name="pref_person_list_sort_by_default">ABS(net_balance) DESC</string>
     <string name="pref_item_list_sort_by_default">created_at DESC</string>
+
+    <string name="history_description_middle_loaned">&#160;loaned&#160;</string>
+    <string name="history_description_middle_paid">&#160;paid&#160;</string>
+    <string name="you_upper_case">You</string>
+    <string name="you_lower_case">you</string>
+
+
 
 </resources>

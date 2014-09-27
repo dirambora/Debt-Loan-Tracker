@@ -27,6 +27,7 @@ public class DebtContentProvider extends ContentProvider {
     private final static int PEOPLE = 2;
     private final static int CHANGES = 3;
     private final static int PERSON_INFO = 4;
+    private final static int HISTORY = 5;
 
     private SQLiteDatabase db;
     private DBHelper dbHelper;
@@ -39,6 +40,7 @@ public class DebtContentProvider extends ContentProvider {
         uriMatcher.addURI(AUTH, Storage.People.CONTENT_URI.getLastPathSegment(), PEOPLE);
         uriMatcher.addURI(AUTH, Storage.Changes.CONTENT_URI.getLastPathSegment(), CHANGES);
         uriMatcher.addURI(AUTH, Storage.PersonInfo.CONTENT_URI.getLastPathSegment(), PERSON_INFO);
+        uriMatcher.addURI(AUTH, Storage.History.CONTENT_URI.getLastPathSegment(), HISTORY);
     }
 
     @Override
@@ -84,6 +86,12 @@ public class DebtContentProvider extends ContentProvider {
                 break;
             case PERSON_INFO:
                 result = db.query(Storage.PersonInfo.VIEW_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case HISTORY: {
+                String limit = uri.getQueryParameter("limit");
+                result = db.query(Storage.History.VIEW_NAME, projection, selection, selectionArgs, null, null, sortOrder, limit);
+                break;
+            }
             default:
                 break;
         }

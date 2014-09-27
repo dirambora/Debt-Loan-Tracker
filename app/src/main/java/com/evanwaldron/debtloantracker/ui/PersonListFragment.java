@@ -211,12 +211,14 @@ public class PersonListFragment extends ListFragment
     }
 
     private static final String[] PERSON_LIST_PROJECTION = { Storage.PersonInfo.ID, Storage.PersonInfo.NAME, Storage.PersonInfo.NET_BALANCE };
+    private static final String SELECTION_CLAUSE_HIDE_ZERO = " AND " + Storage.PersonInfo.NET_BALANCE + " != 0.0";
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortBy = prefs.getString(getString(R.string.pref_key_person_list_sort_by), getString(R.string.pref_person_list_sort_by_default));
-        return new CursorLoader(getActivity(), Storage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, mSelection, null, sortBy);
+        boolean showZeroBalance = prefs.getBoolean(getString(R.string.pref_key_person_list_show_zero), true);
+        return new CursorLoader(getActivity(), Storage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, !showZeroBalance ? mSelection + SELECTION_CLAUSE_HIDE_ZERO : mSelection, null, sortBy);
     }
 
     @Override

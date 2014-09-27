@@ -85,9 +85,10 @@ public final class Storage {
         public static final String PERSON_ID = Changes.PERSON_ID;
         public static final String ITEM_ID = Changes.ITEM_ID;
         public static final String NAME = People.NAME;
-        public static final String AMOUNT = Changes.AMOUNT;
+        public static final String CHANGE_AMOUNT = "change_amount";
         public static final String DATE = Changes.DATE;
         public static final String DESCRIPTION = Items.DESCRIPTION;
+        public static final String ITEM_AMOUNT = "item_amount";
 
         public static final Uri CONTENT_URI = Uri.parse(URI_PREFIX + AUTH + "/history");
     }
