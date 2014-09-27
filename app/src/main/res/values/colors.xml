@@ -2,4 +2,5 @@
 <resources>
     <color name="loan_green">#ff00bc3b</color>
     <color name="nav_drawer_background">#e1555555</color>
+    <color name="date_gray_text">#999999</color>
 </resources>

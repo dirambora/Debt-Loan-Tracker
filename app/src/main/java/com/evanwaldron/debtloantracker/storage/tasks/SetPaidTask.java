@@ -33,11 +33,13 @@ public class SetPaidTask extends DbBatchTask<Pair<Integer, Boolean>> {
 
         for(Pair<Integer, Boolean> info : params){
             operations.add(SetPaidOperation.newOperation(info));
+
+            Cursor item = resolver.query(Storage.Items.CONTENT_URI, ITEM_PROJECTION, ITEM_SELECTION, new String[]{ Integer.toString(info.first) }, null);
+            item.moveToFirst();
+            int personId = item.getInt(0);
+            double amount = item.getDouble(1);
+
             if(info.second){
-                Cursor item = resolver.query(Storage.Items.CONTENT_URI, ITEM_PROJECTION, ITEM_SELECTION, new String[]{ Integer.toString(info.first) }, null);
-                item.moveToFirst();
-                int personId = item.getInt(0);
-                double amount = item.getDouble(1);
                 AddChangeOperation.Params changeParams = new AddChangeOperation.Params();
                 changeParams.itemId = info.first;
                 changeParams.personId = personId;
@@ -45,7 +47,7 @@ public class SetPaidTask extends DbBatchTask<Pair<Integer, Boolean>> {
                 ContentProviderOperation addChange = AddChangeOperation.newOperation(changeParams);
                 operations.add(addChange);
             }else{
-                ContentProviderOperation deleteChanges = DeleteAllChangesOperation.newOperationItemId(info.first);
+                ContentProviderOperation deleteChanges = DeleteAllChangesOperation.newOperationDeleteAllButFirst(info.first, amount);
                 operations.add(deleteChanges);
             }
         }

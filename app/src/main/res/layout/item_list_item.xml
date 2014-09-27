@@ -3,13 +3,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp">
 
     <TextView
         android:id="@+id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"/>
+        android:minLines="2"
+        android:maxLines="2"
+        android:lines="2"
+        android:textStyle="italic"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:textColor="@color/date_gray_text"
+        android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/description"
@@ -17,12 +29,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center_horizontal"
+        android:layout_gravity="center"
         android:textSize="20sp"/>
 
     <TextView
         android:id="@+id/amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:textSize="20sp" />
 
 </LinearLayout>

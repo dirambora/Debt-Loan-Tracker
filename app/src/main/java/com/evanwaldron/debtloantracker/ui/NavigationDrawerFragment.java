@@ -190,7 +190,6 @@ public class NavigationDrawerFragment extends Fragment {
     private static final int POSITION_SETTINGS = 2;
 
     private void selectItem(int position) {
-        boolean sameItem = (position == mCurrentSelectedPosition);
         if(position != POSITION_SETTINGS) {
             mCurrentSelectedPosition = position;
         }
@@ -200,7 +199,7 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerLayout != null && position != POSITION_SETTINGS) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null && !sameItem) {
+        if (mCallbacks != null) {
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
     }

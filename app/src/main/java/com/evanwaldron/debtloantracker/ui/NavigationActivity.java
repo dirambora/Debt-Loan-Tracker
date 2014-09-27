@@ -20,7 +20,7 @@ import com.evanwaldron.debtloantracker.R;
 
 
 public class NavigationActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, FragmentManager.OnBackStackChangedListener {
 
     /**
      * Interface that MUST be implemented by any fragment used in this activity that wishes to make
@@ -49,6 +49,8 @@ public class NavigationActivity extends Activity
      */
     private ActionBarConfigurer mCurActionBarConfig = null;
 
+    private int mCurSelectedItem = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +66,8 @@ public class NavigationActivity extends Activity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        getFragmentManager().addOnBackStackChangedListener(this);
 
         if(savedInstanceState != null){
             mCurActionBarConfig = (ActionBarConfigurer) getFragmentManager().findFragmentById(R.id.container);
@@ -88,6 +92,7 @@ public class NavigationActivity extends Activity
         HistoryFragment fragment = new HistoryFragment();
         mCurActionBarConfig = fragment;
         getFragmentManager().beginTransaction()
+                .addToBackStack(null)
                 .replace(R.id.container, fragment)
                 .commit();
     }
@@ -102,7 +107,10 @@ public class NavigationActivity extends Activity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-
+        if(position == mCurSelectedItem){
+            return;
+        }
+        mCurSelectedItem = position;
         switch(position){
             case 0:
                 showPersonListFragment();
@@ -171,5 +179,14 @@ public class NavigationActivity extends Activity
             return;
         }
         super.onBackPressed();
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        FragmentManager manager = getFragmentManager();
+        if(manager.getBackStackEntryCount() == 0){
+            mCurActionBarConfig = (ActionBarConfigurer) manager.findFragmentById(R.id.container);
+            mCurSelectedItem = 0;
+        }
     }
 }

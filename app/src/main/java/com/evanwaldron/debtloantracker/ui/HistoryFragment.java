@@ -52,6 +52,8 @@ public class HistoryFragment extends ListFragment implements NavigationActivity.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mItemLimit = prefs.getInt(getString(R.string.pref_key_history_show_items_num), -1);
 
+        setHasOptionsMenu(true);
+
         mAdapter = new HistoryAdapter(getActivity());
         setListAdapter(mAdapter);
     }

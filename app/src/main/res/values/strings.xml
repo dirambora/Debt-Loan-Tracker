@@ -53,4 +53,9 @@
     <string name="history_description_loaned_you">&#160;loaned you&#160;</string>
     <string name="history_description_paid_you">&#160;paid you&#160;</string>
     <string name="history_description_for">&#160;for&#160;</string>
+
+    <string name="are_you_sure">Are You Sure?</string>
+    <string name="delete_item_message">Deleting an item from the database is permanent and cannot be undone. Continue?</string>
+    <string name="delete_person_message">Deleting a person is permanent and will completely remove them from the database. Continue?</string>
+    <string name="clear_items_message">This action will set all unpaid items to paid for this person, clearing their balance to $0.00. Continue?</string>
 </resources>

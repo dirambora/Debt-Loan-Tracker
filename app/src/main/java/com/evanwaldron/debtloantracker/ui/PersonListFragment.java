@@ -212,15 +212,31 @@ public class PersonListFragment extends ListFragment
         intent.putExtra(PersonDetailFragment.ARG_PERSON_ID, personId);
         startActivity(intent);
     }
-    private void deletePerson(int personId){
-        DeletePersonTask task = new DeletePersonTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+    private void deletePerson(final int personId){
+        showConfirmDialog(R.string.delete_person_message, new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
-                Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                DeletePersonTask task = new DeletePersonTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+                    @Override
+                    public boolean handleMessage(Message msg) {
+                        Toast.makeText(getActivity(), (String) msg.obj, Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }));
+                task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
                 return true;
             }
-        }));
-        task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
+        });
+    }
+    private void showConfirmDialog(final int textResId, final Handler.Callback callback){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag(ConfirmDialogFragment.FRAGMENT_TAG);
+        if(prev != null){
+            ft.remove(prev);
+        }
+        ConfirmDialogFragment fragment = ConfirmDialogFragment.newInstance(getString(textResId));
+        fragment.setHandler(new Handler(callback));
+        fragment.show(ft, ConfirmDialogFragment.FRAGMENT_TAG);
     }
     private void startLoader(){
         LoaderManager manager = getLoaderManager();
@@ -230,15 +246,21 @@ public class PersonListFragment extends ListFragment
             manager.restartLoader(R.id.person_list_loader, null, this);
         }
     }
-    private void clearPersonItems(int personId){
-        ClearItemsTask clearItems = new ClearItemsTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+    private void clearPersonItems(final int personId){
+        showConfirmDialog(R.string.clear_items_message, new Handler.Callback(){
             @Override
             public boolean handleMessage(Message msg) {
-                Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                ClearItemsTask clearItems = new ClearItemsTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+                    @Override
+                    public boolean handleMessage(Message msg) {
+                        Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }));
+                clearItems.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
                 return true;
             }
-        }));
-        clearItems.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
+        });
     }
     /* -------------- End private class methods ----------------- */
 

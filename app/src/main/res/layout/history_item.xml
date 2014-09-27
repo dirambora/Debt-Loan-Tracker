@@ -31,6 +31,6 @@
         android:textStyle="italic"
         android:gravity="center"
         android:layout_gravity="center"
-        android:textColor="#999999"/>
+        android:textColor="@color/date_gray_text"/>
 
 </LinearLayout>

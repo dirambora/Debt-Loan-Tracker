@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
+import com.evanwaldron.debtloantracker.storage.tasks.DeleteItemTask;
 import com.evanwaldron.debtloantracker.storage.tasks.SetPaidTask;
 import com.evanwaldron.debtloantracker.storage.Storage;
 
@@ -220,6 +221,35 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
         }
     }
 
+    private void showConfirmDialog(final Handler.Callback callback){
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag(ConfirmDialogFragment.FRAGMENT_TAG);
+        if(prev != null){
+            transaction.remove(prev);
+        }
+
+        ConfirmDialogFragment dialogFragment = ConfirmDialogFragment.newInstance(getString(R.string.delete_item_message));
+        dialogFragment.setHandler(new Handler(callback));
+        dialogFragment.show(transaction, ConfirmDialogFragment.FRAGMENT_TAG);
+    }
+
+    private void deleteItem(final int itemId){
+        showConfirmDialog(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                DeleteItemTask task = new DeleteItemTask(getActivity().getContentResolver(), new Handler(new Handler.Callback(){
+                    @Override
+                    public boolean handleMessage(Message msg) {
+                        Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }));
+                task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, itemId);
+                return true;
+            }
+        });
+    }
+
     private static final String SELECTION_ALL = null;
     private static final String SELECTION_DEBTS_ONLY = Storage.Items.AMOUNT + " < 0";
     private static final String SELECTION_LOANS_ONLY = Storage.Items.AMOUNT + " > 0";
@@ -308,7 +338,7 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
                 return null;
             }
 
-            return android.text.format.DateFormat.format("M/d/yy", date);
+            return android.text.format.DateFormat.format("MMM d \nh:mm a ", date);
         }
 
         private void bindAmount(TextView view, double amount){
@@ -424,11 +454,15 @@ public class ItemListFragment extends ListFragment implements ActionBar.OnNaviga
                     .setItems(mPayed ? R.array.item_long_click_menu_paid : R.array.item_long_click_menu_unpaid, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            ItemListFragment fragment = (ItemListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
                             switch(which){
                                 case 0:
-                                    ItemListFragment fragment = (ItemListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
                                     fragment.setPaid(mItemId, !mPayed);
                                     break;
+                                case 1:
+                                    fragment.deleteItem(mItemId);
+                                    break;
+
                             }
                         }
                     });
