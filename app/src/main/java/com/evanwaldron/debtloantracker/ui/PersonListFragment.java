@@ -59,6 +59,7 @@ public class PersonListFragment extends ListFragment
     private static final String TAG_LONG_CLICK_OPTIONS = "long_click_options";
 
     private static final String SELECTION_ALL = null;
+    private static final String SELECTION_ALL_HIDE_ZERO = Storage.PersonInfo.NET_BALANCE + " != 0.0";
     private static final String SELECTION_DEBTS_ONLY = Storage.PersonInfo.NET_BALANCE + " < 0";
     private static final String SELECTION_LOANS_ONLY = Storage.PersonInfo.NET_BALANCE + " > 0";
 
@@ -82,6 +83,12 @@ public class PersonListFragment extends ListFragment
 
         mAdapter = new PersonListAdapter(getActivity());
         setListAdapter(mAdapter);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        startLoader();
     }
 
     @Override
@@ -271,7 +278,14 @@ public class PersonListFragment extends ListFragment
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortBy = prefs.getString(getString(R.string.pref_key_person_list_sort_by), getString(R.string.pref_person_list_sort_by_default));
         boolean showZeroBalance = prefs.getBoolean(getString(R.string.pref_key_person_list_show_zero), true);
-        return new CursorLoader(getActivity(), Storage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, !showZeroBalance ? mSelection + SELECTION_CLAUSE_HIDE_ZERO : mSelection, null, sortBy);
+        StringBuilder selection = new StringBuilder();
+        if(mSelection != null){
+            selection.append(mSelection);
+        }
+        if(!showZeroBalance){
+            selection.append((mSelection == null) ? SELECTION_ALL_HIDE_ZERO : SELECTION_CLAUSE_HIDE_ZERO);
+        }
+        return new CursorLoader(getActivity(), Storage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, selection.toString(), null, sortBy);
     }
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
