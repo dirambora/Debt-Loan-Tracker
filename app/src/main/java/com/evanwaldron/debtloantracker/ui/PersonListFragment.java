@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evanwaldron.debtloantracker.R;
+import com.evanwaldron.debtloantracker.storage.tasks.ClearItemsTask;
 import com.evanwaldron.debtloantracker.storage.tasks.DeletePersonTask;
 import com.evanwaldron.debtloantracker.storage.Storage;
 
@@ -111,7 +112,7 @@ public class PersonListFragment extends ListFragment
     }
     /* --------------- End lifecycle methods -------------------- */
 
-    
+
     /* ------------- Item selection callbacks ------------------- */
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -228,6 +229,16 @@ public class PersonListFragment extends ListFragment
         }else{
             manager.restartLoader(R.id.person_list_loader, null, this);
         }
+    }
+    private void clearPersonItems(int personId){
+        ClearItemsTask clearItems = new ClearItemsTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }));
+        clearItems.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
     }
     /* -------------- End private class methods ----------------- */
 
@@ -357,12 +368,14 @@ public class PersonListFragment extends ListFragment
     }
     public static final class LongClickDialog extends DialogFragment{
 
+        /* ------------ Private constants ------------- */
         private static final String ARG_PERSON_ID = "person_id";
         private static final String ARG_PERSON_NAME = "person_name";
 
         private static final int DETAILS = 0;
         private static final int CLEAR_ITEMS = 1;
         private static final int DELETE_PERSON = 2;
+        /* ---------- End private constants ----------- */
 
         public static LongClickDialog newInstance(int personId, String personName){
             LongClickDialog dialog = new LongClickDialog();
@@ -402,6 +415,8 @@ public class PersonListFragment extends ListFragment
                                 case DETAILS:
                                     fragment.showPersonDetails(mPersonId, mPersonName);
                                     break;
+                                case CLEAR_ITEMS:
+                                    fragment.clearPersonItems(mPersonId);
                             }
                         }
                     });

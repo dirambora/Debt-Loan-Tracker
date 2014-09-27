@@ -183,6 +183,13 @@ public class HistoryFragment extends ListFragment implements NavigationActivity.
 
             private static final void appendFirstSection(Context ctx, SpannableStringBuilder builder, String name, double changeAmount, double itemAmount){
                 if(changeAmount < 0){
+                    appendName(builder, name);
+                    if(itemAmount < 0){
+                        builder.append(ctx.getString(R.string.history_description_loaned_you));
+                    }else{
+                        builder.append(ctx.getString(R.string.history_description_paid_you));
+                    }
+                }else{
                     if(itemAmount < 0){
                         builder.append(ctx.getString(R.string.history_description_you_paid));
                     }else{
@@ -190,18 +197,27 @@ public class HistoryFragment extends ListFragment implements NavigationActivity.
                     }
                     appendName(builder, name);
                     builder.append(' ');
-                }else{
-                    appendName(builder, name);
+                }
+            }
+
+            private static final int getAmountColor(Context ctx, double changeAmount, double itemAmount){
+                if(changeAmount < 0){
                     if(itemAmount < 0){
-                        builder.append(ctx.getString(R.string.history_description_loaned_you));
+                        return ctx.getResources().getColor(R.color.loan_green);
                     }else{
-                        builder.append(ctx.getString(R.string.history_description_paid_you));
+                        return ctx.getResources().getColor(R.color.loan_green);
+                    }
+                }else{
+                    if(itemAmount < 0){
+                        return Color.RED;
+                    }else{
+                        return ctx.getResources().getColor(R.color.loan_green);
                     }
                 }
             }
 
-            private static final void appendChangeAmount(Context ctx, SpannableStringBuilder builder, double changeAmount){
-                int color = (changeAmount < 0) ? Color.RED : ctx.getResources().getColor(R.color.loan_green);
+            private static final void appendChangeAmount(Context ctx, SpannableStringBuilder builder, double changeAmount, double itemAmount){
+                int color = (changeAmount < 0) ? ctx.getResources().getColor(R.color.loan_green) : Color.RED;
                 int spanStart = builder.length();
                 builder.append(sCurrencyFormat.format(Math.abs(changeAmount)));
                 builder.setSpan(new ForegroundColorSpan(color), spanStart, builder.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -216,7 +232,7 @@ public class HistoryFragment extends ListFragment implements NavigationActivity.
             public HistoryDescription(Context ctx, String name, String itemDescription, double changeAmount, double itemAmount){
                 spannable = new SpannableStringBuilder();
                 appendFirstSection(ctx, spannable, name, changeAmount, itemAmount);
-                appendChangeAmount(ctx, spannable, changeAmount);
+                appendChangeAmount(ctx, spannable, changeAmount, itemAmount);
                 appendItemDescription(ctx, spannable, itemDescription);
             }
 
