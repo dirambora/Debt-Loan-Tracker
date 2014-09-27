@@ -47,12 +47,33 @@ import java.util.Locale;
 public class PersonListFragment extends ListFragment
         implements NavigationActivity.ActionBarConfigurer, ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>{
 
+    /* ------------------- Public constants ---------------------- */
     public static final String TAG = "person_list";
+    /* ----------------- End public constants -------------------- */
 
+
+    /* ------------------- Private contants ---------------------- */
+    private static final String TAG_ADD_ITEM_DIALOG = "add_item_dialog";
+    private static final String TAG_SORT_BY_DIALOG = "sort_by_dialog";
+    private static final String TAG_LONG_CLICK_OPTIONS = "long_click_options";
+
+    private static final String SELECTION_ALL = null;
+    private static final String SELECTION_DEBTS_ONLY = Storage.PersonInfo.NET_BALANCE + " < 0";
+    private static final String SELECTION_LOANS_ONLY = Storage.PersonInfo.NET_BALANCE + " > 0";
+
+    private static final String[] PERSON_LIST_PROJECTION = { Storage.PersonInfo.ID, Storage.PersonInfo.NAME, Storage.PersonInfo.NET_BALANCE };
+    private static final String SELECTION_CLAUSE_HIDE_ZERO = " AND " + Storage.PersonInfo.NET_BALANCE + " != 0.0";
+    /* ----------------- End private constants ------------------- */
+
+
+    /* -------------------- Class variables ---------------------- */
     private CursorAdapter mAdapter;
     private int mCurNavSelection = -1;
     private String mSelection = SELECTION_ALL;
+    /* ------------------ End class variables -------------------- */
 
+
+    /* ------------------ Lifecycle methods ---------------------- */
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -81,13 +102,6 @@ public class PersonListFragment extends ListFragment
     }
 
     @Override
-    public void configureActionBar(ActionBar actionBar) {
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setListNavigationCallbacks(ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.person_list_nav_items, android.R.layout.simple_spinner_dropdown_item), this);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         if(((NavigationActivity)getActivity()).isDrawerOpen()){
             super.onCreateOptionsMenu(menu, inflater);
@@ -95,48 +109,10 @@ public class PersonListFragment extends ListFragment
             inflater.inflate(R.menu.person_list, menu);
         }
     }
+    /* --------------- End lifecycle methods -------------------- */
 
-    private static final String TAG_ADD_ITEM_DIALOG = "add_item_dialog";
-
-    private void showAddItemDialog(int mode){
-        DialogFragment dialog = AddItemDialog.newInstance(mode);
-        showDialogFragment(dialog, TAG_ADD_ITEM_DIALOG);
-    }
-
-    private static final String TAG_SORT_BY_DIALOG = "sort_by_dialog";
-
-    private void showSortByDialog(){
-        SortByDialogFragment dialog = new SortByDialogFragment();
-        dialog.setHandler(new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                getLoaderManager().restartLoader(R.id.person_list_loader, null, PersonListFragment.this);
-                return true;
-            }
-        }));
-
-        showDialogFragment(dialog, TAG_SORT_BY_DIALOG);
-    }
-
-    private static final String TAG_LONG_CLICK_OPTIONS = "long_click_options";
-
-    private void showLongClickOptions(int personId, String name){
-        LongClickDialog dialog = LongClickDialog.newInstance(personId, name);
-        showDialogFragment(dialog, TAG_LONG_CLICK_OPTIONS);
-    }
-
-    private void showDialogFragment(DialogFragment fragment, String tag){
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        if(tag != null) {
-            Fragment prev = getFragmentManager().findFragmentByTag(tag);
-            if (prev != null) {
-                transaction.remove(prev);
-            }
-        }
-        transaction.addToBackStack(null);
-        fragment.show(transaction, tag);
-    }
-
+    
+    /* ------------- Item selection callbacks ------------------- */
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
@@ -152,33 +128,17 @@ public class PersonListFragment extends ListFragment
         }
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     public void onListItemClick(ListView list, View view, int position, long id){
         int personId = (Integer) view.getTag(R.id.person_id);
         String personName = ((TextView)view.getTag(R.id.name)).getText().toString();
 
-        Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
-        intent.putExtra(PersonDetailFragment.ARG_PERSON_NAME, personName);
-        intent.putExtra(PersonDetailFragment.ARG_PERSON_ID, personId);
-        startActivity(intent);
+        showPersonDetails(personId, personName);
     }
+    /* ----------- End item selection callbacks ----------------- */
 
-    private void deletePerson(int personId){
-        DeletePersonTask task = new DeletePersonTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        }));
-        task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
-    }
 
-    private static final String SELECTION_ALL = null;
-    private static final String SELECTION_DEBTS_ONLY = Storage.PersonInfo.NET_BALANCE + " < 0";
-    private static final String SELECTION_LOANS_ONLY = Storage.PersonInfo.NET_BALANCE + " > 0";
-
+    /* ------ ActionBar.OnNavigationListener Callback ----------- */
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         if(itemPosition == mCurNavSelection){ return true; }
@@ -200,7 +160,67 @@ public class PersonListFragment extends ListFragment
 
         return true;
     }
+    /* ---- End ActionBar.OnNavigationListener Callback --------- */
 
+
+    /* ---- NavigationActivity.ActionBarConfigurer Callback ----- */
+    @Override
+    public void configureActionBar(ActionBar actionBar) {
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setListNavigationCallbacks(ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.person_list_nav_items, android.R.layout.simple_spinner_dropdown_item), this);
+    }
+    /* -- End NavigationActivity.ActionBarConfigurer Callback --- */
+
+
+    /* ------------ Private class methods ----------------------- */
+    private void showAddItemDialog(int mode){
+        DialogFragment dialog = AddItemDialog.newInstance(mode);
+        showDialogFragment(dialog, TAG_ADD_ITEM_DIALOG);
+    }
+    private void showSortByDialog(){
+        SortByDialogFragment dialog = new SortByDialogFragment();
+        dialog.setHandler(new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                getLoaderManager().restartLoader(R.id.person_list_loader, null, PersonListFragment.this);
+                return true;
+            }
+        }));
+
+        showDialogFragment(dialog, TAG_SORT_BY_DIALOG);
+    }
+    private void showLongClickOptions(int personId, String name){
+        LongClickDialog dialog = LongClickDialog.newInstance(personId, name);
+        showDialogFragment(dialog, TAG_LONG_CLICK_OPTIONS);
+    }
+    private void showDialogFragment(DialogFragment fragment, String tag){
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        if(tag != null) {
+            Fragment prev = getFragmentManager().findFragmentByTag(tag);
+            if (prev != null) {
+                transaction.remove(prev);
+            }
+        }
+        transaction.addToBackStack(null);
+        fragment.show(transaction, tag);
+    }
+    private void showPersonDetails(int personId, String personName){
+        Intent intent = new Intent(getActivity(), PersonDetailActivity.class);
+        intent.putExtra(PersonDetailFragment.ARG_PERSON_NAME, personName);
+        intent.putExtra(PersonDetailFragment.ARG_PERSON_ID, personId);
+        startActivity(intent);
+    }
+    private void deletePerson(int personId){
+        DeletePersonTask task = new DeletePersonTask(getActivity().getContentResolver(), new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                Toast.makeText(getActivity(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }));
+        task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, personId);
+    }
     private void startLoader(){
         LoaderManager manager = getLoaderManager();
         if(manager.getLoader(R.id.person_list_loader) == null){
@@ -209,10 +229,10 @@ public class PersonListFragment extends ListFragment
             manager.restartLoader(R.id.person_list_loader, null, this);
         }
     }
+    /* -------------- End private class methods ----------------- */
 
-    private static final String[] PERSON_LIST_PROJECTION = { Storage.PersonInfo.ID, Storage.PersonInfo.NAME, Storage.PersonInfo.NET_BALANCE };
-    private static final String SELECTION_CLAUSE_HIDE_ZERO = " AND " + Storage.PersonInfo.NET_BALANCE + " != 0.0";
 
+    /* --------- LoaderManager.LoaderCallbacks callback -------- */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -220,7 +240,6 @@ public class PersonListFragment extends ListFragment
         boolean showZeroBalance = prefs.getBoolean(getString(R.string.pref_key_person_list_show_zero), true);
         return new CursorLoader(getActivity(), Storage.PersonInfo.CONTENT_URI, PERSON_LIST_PROJECTION, !showZeroBalance ? mSelection + SELECTION_CLAUSE_HIDE_ZERO : mSelection, null, sortBy);
     }
-
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
@@ -228,12 +247,14 @@ public class PersonListFragment extends ListFragment
             setEmptyText("No entries");
         }
     }
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
     }
+    /* ------- End LoaderManager.LoaderCallbacks callback ------ */
 
+
+    /* ------------- Private subclasses -------------- */
     private static final class PersonListAdapter extends CursorAdapter {
 
         private NumberFormat mCurrencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
@@ -277,7 +298,10 @@ public class PersonListFragment extends ListFragment
             view.setText(mCurrencyFormat.format(Math.abs(balance)));
         }
     }
+    /* ----------- End private subclasses ------------ */
 
+
+    /* ------------- Public subclasses --------------- */
     public static final class SortByDialogFragment extends DialogFragment{
 
         private String[] sortByOptions;
@@ -331,7 +355,6 @@ public class PersonListFragment extends ListFragment
             return -1;
         }
     }
-
     public static final class LongClickDialog extends DialogFragment{
 
         private static final String ARG_PERSON_ID = "person_id";
@@ -371,10 +394,13 @@ public class PersonListFragment extends ListFragment
                     .setItems(R.array.person_long_click_menu, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            PersonListFragment fragment = (PersonListFragment) getFragmentManager().findFragmentByTag(TAG);
                             switch (which){
                                 case DELETE_PERSON:
-                                    PersonListFragment fragment = (PersonListFragment) getFragmentManager().findFragmentByTag(TAG);
                                     fragment.deletePerson(mPersonId);
+                                    break;
+                                case DETAILS:
+                                    fragment.showPersonDetails(mPersonId, mPersonName);
                                     break;
                             }
                         }
@@ -384,4 +410,5 @@ public class PersonListFragment extends ListFragment
         }
 
     }
+    /* ----------- End public subclasses ------------- */
 }
