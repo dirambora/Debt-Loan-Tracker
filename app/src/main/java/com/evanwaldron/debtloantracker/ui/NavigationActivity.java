@@ -64,6 +64,10 @@ public class NavigationActivity extends Activity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        if(savedInstanceState != null){
+            mCurActionBarConfig = (ActionBarConfigurer) getFragmentManager().findFragmentById(R.id.container);
+        }
     }
 
     /**
